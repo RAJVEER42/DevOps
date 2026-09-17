@@ -1,233 +1,232 @@
-# Linux Fundamentals - Homework
+# Linux Fundamentals
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
 
-My notes and practice for four Linux tasks: links, user creation, journalctl, and a command cheat sheet.
+Working notes for the Linux assignment. Every command below was run in an Ubuntu 24.04
+environment (hostname `ubuntu-lab`) and the output was captured as screenshots.
 
-## Task 1: Soft Link and Hard Link
+## Part 1 - Hard links vs symbolic links
 
-### Hard Link
-- Points directly to the inode (the actual data on disk), not to a filename.
-- The data is deleted only when all hard links to it are removed.
-- Cannot cross different filesystems/partitions.
-- Cannot link to a directory.
-- Shares the same inode number as the original file.
+A file name in Linux is just a directory entry that points at an inode. The inode holds the
+actual metadata and data blocks. Links are two different ways of giving that data another name.
 
-### Soft Link (Symbolic Link)
-- Points to the pathname of another file, like a shortcut.
-- If the original file is deleted, the symlink breaks (dangling link).
-- Can cross filesystems/partitions.
-- Can link to a directory.
-- Has its own inode. In `ls -l` it shows as `link -> target`.
+**Hard link** - a second directory entry pointing at the *same inode*. Both names are equal
+peers; there is no "original". The link count on the inode goes up by one, and the data is only
+freed when the count drops to zero.
 
-### Difference
+**Symbolic (soft) link** - a separate small file whose content is a *path* to another file.
+It has its own inode. If the target is removed the link stays behind but points at nothing.
 
-| Feature | Hard Link | Soft Link |
+| | Hard link | Symbolic link |
 |---|---|---|
-| Points to | Inode (data) | Pathname (filename) |
-| Cross filesystem | No | Yes |
-| Link to directory | No | Yes |
-| If original deleted | Data still accessible | Link breaks |
-| Inode number | Same as original | Different |
+| What it stores | Inode reference | A path string |
+| Own inode? | No, shares the target's | Yes |
+| Survives deleting the target | Yes, data stays reachable | No, becomes dangling |
+| Works across filesystems | No | Yes |
+| Can point to a directory | No (normal users) | Yes |
+| `ls -l` marker | Looks like a regular file | `l` type, shows `-> target` |
 
-### Commands
-Create a hard link:
+### Commands used
+
 ```bash
-ln original.txt hardlink.txt
+ln notes.txt notes-hard.txt        # hard link
+ln -s notes.txt notes-soft.txt     # symbolic link
+ls -li                             # -i shows inode numbers
+stat -c "%n inode=%i links=%h" notes.txt notes-hard.txt notes-soft.txt
+rm notes.txt                       # delete the original name
+unlink notes-soft.txt              # remove a link (same as rm)
 ```
 
-Create a soft link:
+### What the run showed
+
+- `notes.txt` and `notes-hard.txt` had the same inode (`1917441`) and a link count of 2.
+- `notes-soft.txt` had a different inode and a link count of 1.
+- Appending to the hard link changed `notes.txt` too, since they are the same data.
+- After `rm notes.txt`, the hard link still printed both lines. The symlink returned
+  `No such file or directory`.
+
+![hard link vs soft link](screenshots/hard-vs-soft-link.png)
+
+## Part 2 - useradd vs adduser
+
+Both create users, but they sit at different levels.
+
+- `useradd` is the low-level binary from the shadow-utils package. It does exactly what the
+  flags say and nothing more. Without `-m` there is no home directory, without `-s` the shell is
+  the system default (`/bin/sh` on Debian-based systems), and no password is set.
+- `adduser` is a Perl front-end shipped by Debian and Ubuntu. It calls `useradd` internally,
+  but it also creates the home directory, copies `/etc/skel`, picks the next free UID, sets
+  `/bin/bash`, adds the user to the `users` group, and prompts for a password and full name.
+
+**Which one on Ubuntu?** `adduser` for interactive admin work, because it leaves the account
+in a usable state in one step. `useradd` is the better choice inside scripts and Dockerfiles
+where you want every detail spelled out and no prompts.
+
+### Commands used
+
 ```bash
-ln -s original.txt softlink.txt
+useradd -m -s /bin/bash devuser1
+id devuser1
+grep devuser1 /etc/passwd
+
+adduser --disabled-password --gecos "Dev User Two" devuser2
+id devuser2
+grep devuser2 /etc/passwd
+ls -la /home/devuser2
 ```
 
-Delete a link:
+`--disabled-password` and `--gecos` were passed so the run is non-interactive; without them
+`adduser` prompts for a password and the name fields.
+
+### What the run showed
+
+- `useradd` created `devuser1` with only the basics: uid 1001, one group, an empty home.
+- `adduser` printed each step it took: choosing uid 1002, creating the group, creating the home,
+  copying skeleton files, and adding the user to the extra `users` group. The GECOS field
+  (`Dev User Two,,,`) and `/bin/bash` shell show up in `/etc/passwd`, and the home directory
+  already contains `.bashrc`, `.profile` and `.bash_logout`.
+- Note: the stock `ubuntu:24.04` container image does not ship `adduser`, so it was installed
+  first with `apt-get install adduser`.
+
+![useradd vs adduser](screenshots/useradd-vs-adduser.png)
+
+## Part 3 - journalctl
+
+`journalctl` queries the binary log kept by `systemd-journald`. Instead of grepping through
+`/var/log/*.log`, you filter the journal by unit, priority, boot, or time range.
+
+Frequently used forms:
+
 ```bash
-rm hardlink.txt
-unlink softlink.txt
+journalctl                      # everything, oldest first (paged)
+journalctl -b                   # only the current boot
+journalctl -n 20                # last 20 lines
+journalctl -f                   # follow, like tail -f
+journalctl -u cron              # a single unit's log
+journalctl -p err               # priority err and worse
+journalctl --since "2 minutes ago"
+journalctl --since today --until "1 hour ago"
+journalctl --no-pager           # plain output, useful in scripts
 ```
 
-### Practice
+### Practice: reading a service's log
+
+A container has no init system, so to test this properly I started `ubuntu:24.04` with
+`systemd` installed and `/usr/lib/systemd/systemd` as PID 1 (`--privileged` and the host's
+cgroup namespace are required). Once `systemctl is-system-running` reported `running`, I
+restarted `cron.service` and then pulled its log entries in several ways:
+
 ```bash
-echo "Hello Linux" > original.txt
-
-ln    original.txt hardlink.txt
-ln -s original.txt softlink.txt
-
-ls -li          # compare inode numbers and link counts
-
-rm original.txt
-cat hardlink.txt     # still prints "Hello Linux"
-cat softlink.txt     # No such file or directory
+systemctl restart cron
+systemctl --no-pager status cron
+journalctl --no-pager -b -n 12
+journalctl --no-pager -u cron
+journalctl --no-pager -p err -b -n 5
+journalctl --no-pager --since "2 minutes ago" -n 5
 ```
 
-### Screenshot
+The `-u cron` output shows the stop/start pair from the restart and cron's own startup lines,
+the `-p err` filter returned `-- No entries --` because nothing had failed, and the time filter
+returned only the recent lines.
 
-![Task 1 - hard and soft links](screenshots/image1.png)
+![journalctl](screenshots/journalctl.png)
 
-## Task 2: adduser vs useradd
+## Part 4 - Command cheat sheet
 
-### Difference
+Grouped by what I reach for them.
 
-| | useradd | adduser |
-|---|---|---|
-| Type | Low-level binary | High-level script (wraps useradd) |
-| Interactive | No, needs flags | Yes, prompts for details |
-| Home directory | Only with `-m` | Created automatically |
-| Password | Set separately with passwd | Prompts during creation |
-| Default shell | Often /bin/sh | Sets /bin/bash |
+**Where am I, what is here**
 
-### Which is preferred on Ubuntu and why
-`adduser` is preferred on Ubuntu/Debian because it does the full job in one step: creates the home directory, copies skeleton files from `/etc/skel`, sets a default shell, and prompts for the password and user details. `useradd` is the lower-level tool that `adduser` uses underneath, which is better for scripting.
-
-### Create a test user
-```bash
-sudo adduser testuser
-```
-
-Verify:
-```bash
-id testuser
-grep testuser /etc/passwd
-ls -la /home/testuser
-```
-
-Delete when done:
-```bash
-sudo deluser --remove-home testuser
-```
-
-### Screenshot
-
-![Task 2 - adduser creating testuser](screenshots/image2.png)
-
-## Task 3: journalctl
-
-`journalctl` is used to view logs collected by systemd's journal (systemd-journald). It is the central place to read boot logs, kernel messages, and service logs on systemd-based systems.
-
-### Usage
-View all logs:
-```bash
-journalctl
-```
-
-Jump to the end / follow live:
-```bash
-journalctl -e
-journalctl -f
-```
-
-Logs for a specific service:
-```bash
-journalctl -u ssh.service
-```
-
-Logs since last boot:
-```bash
-journalctl -b
-```
-
-Filter by time:
-```bash
-journalctl --since "1 hour ago"
-journalctl --since today
-```
-
-Only errors:
-```bash
-journalctl -p err
-```
-
-Last 50 lines:
-```bash
-journalctl -n 50
-```
-
-### Practice: logs for a specific service
-```bash
-sudo journalctl -u ssh.service -e
-```
-
-### Screenshot
-
-![Task 3 - journalctl service logs](screenshots/image3.png)
-
-## Task 4: Linux Command Cheat Sheet
-
-### Files and Directories
-| Command | Purpose |
+| Command | Notes |
 |---|---|
-| `pwd` | Print current directory |
-| `ls -la` | List all files with details |
-| `cd /path` | Change directory |
-| `mkdir dir` | Create a directory |
-| `rm file` | Remove a file (`-r` recursive) |
-| `cp src dst` | Copy files |
-| `mv src dst` | Move or rename files |
-| `touch file` | Create empty file |
-| `find /path -name "*.txt"` | Search for files |
+| `pwd` | print working directory |
+| `ls -la` | long listing including dotfiles |
+| `cd -` | jump back to the previous directory |
+| `tree -L 2` | directory tree, two levels (needs the `tree` package) |
+| `find . -name "*.txt"` | search by name; `-type f`, `-mtime -1` for filters |
+| `du -sh *` | size of each item in the current directory |
 
-### Viewing and Editing
-| Command | Purpose |
+**Creating, moving, removing**
+
+| Command | Notes |
 |---|---|
-| `cat file` | Print a file |
-| `less file` | Scroll through a file |
-| `head -n 20 file` | First 20 lines |
-| `tail -n 20 file` | Last 20 lines (`-f` to follow) |
-| `nano` / `vim` | Text editors |
-| `grep "pattern" file` | Search inside files |
+| `mkdir -p a/b/c` | create nested directories in one go |
+| `touch file` | create an empty file or bump its timestamp |
+| `cp -r src dst` | copy; `-r` for directories |
+| `mv old new` | move or rename |
+| `rm -rf dir` | remove recursively without prompting; be careful |
 
-### Permissions
-| Command | Purpose |
+**Reading files**
+
+| Command | Notes |
 |---|---|
-| `chmod 755 file` | Change permissions |
-| `chown user:group file` | Change owner |
-| `ls -l` | View permissions |
+| `cat file` | dump the whole file |
+| `less file` | page through it; `/` to search, `q` to quit |
+| `head -n 5` / `tail -n 5` | first or last lines |
+| `tail -f log` | follow a growing file |
+| `grep -rn "text" .` | recursive search with line numbers |
+| `wc -l file` | count lines |
 
-### Users
-| Command | Purpose |
+**Permissions and ownership**
+
+| Command | Notes |
 |---|---|
-| `whoami` | Current username |
-| `id` | User and group IDs |
-| `sudo adduser name` | Add a user |
-| `passwd` | Change a password |
-| `su - user` | Switch user |
+| `chmod 640 file` | owner rw, group r, others nothing |
+| `chmod +x script.sh` | make executable |
+| `chown user:group file` | change owner and group |
+| `umask` | default permission mask for new files |
 
-### Processes and System
-| Command | Purpose |
+**Users and identity**
+
+| Command | Notes |
 |---|---|
-| `ps aux` | List running processes |
-| `top` | Live process monitor |
-| `kill PID` | Terminate a process |
-| `df -h` | Disk usage |
-| `free -h` | Memory usage |
-| `uname -a` | System info |
+| `whoami` / `id` | current user, uid and groups |
+| `sudo adduser name` | create a user interactively |
+| `passwd name` | set or change a password |
+| `su - name` | switch user with a login shell |
+| `groups name` | list group membership |
 
-### Networking
-| Command | Purpose |
+**Processes and resources**
+
+| Command | Notes |
 |---|---|
-| `ping host` | Test connectivity |
-| `curl url` / `wget url` | Fetch / download |
-| `ip a` | Show network interfaces |
-| `ss -tulpn` | Listening ports |
+| `ps aux` | all processes; pipe into `grep` |
+| `top` / `htop` | live view |
+| `kill -15 PID` | ask a process to exit; `-9` to force |
+| `df -h` | disk usage per filesystem |
+| `free -h` | memory |
+| `uname -a` | kernel and architecture |
+| `uptime` | load averages |
 
-### Services
-| Command | Purpose |
+**Networking**
+
+| Command | Notes |
 |---|---|
-| `systemctl status svc` | Service status |
-| `systemctl restart svc` | Restart a service |
-| `journalctl -u svc` | View service logs |
+| `ip a` / `ip route` | interfaces and routing table |
+| `ss -tulpn` | listening sockets and owning processes |
+| `ping -c 4 host` | reachability |
+| `curl -I url` | HTTP headers only |
 
-### Extras
-| Command | Purpose |
+**Services and logs**
+
+| Command | Notes |
 |---|---|
-| `man command` | Manual page |
-| `history` | Command history |
-| `tar -czvf a.tar.gz dir` | Create archive |
-| `tar -xzvf a.tar.gz` | Extract archive |
-| `apt install pkg` | Install a package |
+| `systemctl status unit` | is it running |
+| `systemctl restart unit` | restart |
+| `systemctl enable --now unit` | start now and on boot |
+| `journalctl -u unit -f` | follow a unit's log |
 
-### Screenshot
+**Packages and archives**
 
-![Task 4 - basic Linux commands](screenshots/image4.png)
+| Command | Notes |
+|---|---|
+| `apt update && apt install pkg` | Debian/Ubuntu packages |
+| `tar -czf out.tgz dir` | create a gzip tarball |
+| `tar -xzf out.tgz` | extract it |
+| `man cmd` / `cmd --help` | built-in documentation |
+| `history \| grep ssh` | find a command you ran before |
+
+A short session exercising the file, permission and process commands:
+
+![basic commands](screenshots/basic-commands.png)

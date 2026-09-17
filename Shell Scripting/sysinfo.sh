@@ -1,39 +1,34 @@
-#!/bin/bash
-# System Information Script
-# Prints basic system info, takes user input, and saves running processes to a file.
 
-# Store data in variables
-CURRENT_DATE=$(date)
-HOST_NAME=$(hostname)
-USER_NAME=$(whoami)
+today=$(date)
+box=$(hostname)
+me=$(whoami)
+disk=$(df -h / | awk 'NR==2 {print $5 " used of " $2}')
+proc_count=$(ps aux | wc -l | tr -d ' ')
 
-echo "=============================="
-echo " SYSTEM INFORMATION"
-echo "=============================="
+echo "=== System summary ==="
+echo "Date        : $today"
+echo "Host        : $box"
+echo "User        : $me"
+echo "Root disk   : $disk"
+echo "Processes   : $proc_count running"
+echo
 
-echo "Current Date : $CURRENT_DATE"
-echo "Hostname     : $HOST_NAME"
-echo "Username     : $USER_NAME"
-
-echo ""
-echo "----- Disk Usage -----"
+echo "--- Disk usage (df -h) ---"
 df -h
+echo
 
-echo ""
-echo "----- Running Processes -----"
-ps aux
+echo "--- Top 10 processes by CPU ---"
+ps aux | sort -rk 3 | head -n 10 | cut -c1-110
+echo
 
-# Take input from the user
-echo ""
-read -p "Enter a name for the report directory: " DIR_NAME
-read -p "Enter a name for the report file: " FILE_NAME
+read -p "Directory to save the report in: " report_dir
+read -p "Report file name: " report_file
 
-# Create directory and file
-mkdir -p "$DIR_NAME"
-touch "$DIR_NAME/$FILE_NAME"
+mkdir -p "$report_dir"
+touch "$report_dir/$report_file"
 
-# Store running processes in the file using output redirection
-ps aux > "$DIR_NAME/$FILE_NAME"
+# Full process list goes to the file with > redirection
+ps aux > "$report_dir/$report_file"
 
-echo ""
-echo "Running processes saved to: $DIR_NAME/$FILE_NAME"
+echo
+echo "Saved $(wc -l < "$report_dir/$report_file" | tr -d ' ') lines of process data to $report_dir/$report_file"

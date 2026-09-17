@@ -1,97 +1,143 @@
-# Networking Fundamentals - Homework
+# Networking Fundamentals
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
 
-Practice of common Linux networking commands, with their output and a short explanation of what each one does.
+Nine everyday networking commands, each run for real, with a note on what the output means.
+Commands that exist on macOS were run on my laptop; the Linux-only ones (`ip`, `ss`, `wget`)
+were run inside an Ubuntu 24.04 container.
 
-## 1. ping
+## 1. ping - is the host reachable, and how far away is it?
+
 ```bash
-ping -c 4 google.com
+ping -c 4 github.com
 ```
-Sends ICMP echo request packets to a host to check if it is reachable and how long the round trip takes. Useful for testing basic connectivity and measuring latency. `-c 4` limits it to 4 packets.
 
-**What I understood:** `ping` tells me whether a server is up and how fast my connection to it is. If packets are lost or there is no reply, there is a network or DNS problem.
+Sends four ICMP echo requests and waits for the replies. The output resolves the name first
+(`20.207.73.82`), then prints one line per reply with the round-trip time. The summary shows
+0% packet loss and min/avg/max latency.
 
-![ping output](screenshots/ping.png)
+Takeaway: a quick yes/no on connectivity plus a feel for latency. Note that some hosts block
+ICMP, so "no reply" does not always mean "down".
 
-## 2. ip a (ip address)
+![ping](screenshots/ping.png)
+
+## 2. ip a - what addresses does this machine have?
+
 ```bash
 ip a
 ```
-Shows all network interfaces on the machine along with their IP addresses, MAC addresses, and status (up/down). This is the modern replacement for `ifconfig`.
 
-**What I understood:** This is how I find my own machine's IP address and see which network interfaces exist (like `eth0`, `lo` for loopback).
+Lists every interface with its state, MAC address and IPv4/IPv6 addresses. In the container
+the two that matter are `lo` (127.0.0.1, loopback) and `eth0` (172.17.0.2/16, the Docker
+bridge). The `/16` is the subnet mask in CIDR form. The other entries (`tunl0`, `gre0`,
+`sit0` and so on) are kernel tunnel devices that exist but are `DOWN`; they can be ignored.
 
-![ip a output](screenshots/ip-a.png)
+Takeaway: this replaces the older `ifconfig`. `ip -br a` gives a compact one-line-per-interface view.
 
-## 3. ip route / route
+![ip a](screenshots/ip-a.png)
+
+## 3. ip route - where do packets go?
+
 ```bash
 ip route
+ip route get 1.1.1.1
 ```
-Displays the routing table, including the default gateway (the router that traffic goes through to reach the internet).
 
-**What I understood:** It shows the path packets take to leave my network. The `default via` line is my gateway/router.
+The first prints the routing table: a `default via 172.17.0.1` line (the gateway for anything
+not matched by a more specific route) and a directly connected route for `172.17.0.0/16`.
+`ip route get` asks the kernel which route a specific destination would use.
 
-![ip route output](screenshots/ip-route.png)
+Takeaway: if the default route is missing or points at the wrong gateway, nothing outside the
+local subnet is reachable.
 
-## 4. netstat / ss
+![ip route](screenshots/ip-route.png)
+
+## 4. ss - which ports are open, and who owns them?
+
 ```bash
+python3 -m http.server 8000 &
 ss -tulpn
+ss -s
 ```
-Lists network connections, listening ports, and the programs using them. `ss` is the faster modern replacement for `netstat`. Flags: `-t` TCP, `-u` UDP, `-l` listening, `-p` process, `-n` numeric.
 
-**What I understood:** This shows which ports are open and which service is listening on each one. Useful to check if a server (like SSH on port 22) is running.
+I started a throwaway HTTP server first so there would be something to see. `ss -tulpn` shows
+it listening on `0.0.0.0:8000`, owned by `python3` with its PID. Flags: `-t` TCP, `-u` UDP,
+`-l` listening only, `-p` process, `-n` numeric ports. `ss -s` prints socket totals.
 
-![ss output](screenshots/ss.png)
+Takeaway: the modern replacement for `netstat`. The first thing to run when a service "won't
+start" because a port is already in use.
 
-## 5. curl
+![ss](screenshots/ss.png)
+
+## 5. curl - talk HTTP from the terminal
+
 ```bash
-curl -I https://www.google.com
+curl -I https://github.com
 ```
-Transfers data to or from a server. `-I` fetches only the HTTP response headers. Commonly used to test APIs and web endpoints.
 
-**What I understood:** `curl` lets me talk to a web server from the terminal. The headers tell me the status code (e.g. `200 OK`) and server details.
+`-I` sends a HEAD request and prints only the response headers. The `HTTP/2 200` status line
+confirms the site answered, and the headers reveal the server, caching policy, cookies and
+security settings such as `strict-transport-security`.
 
-![curl output](screenshots/curl.png)
+Takeaway: `curl` is the Swiss-army knife for APIs. Other forms I use: `-s` silent, `-o file`
+to save, `-X POST -d '{...}'` to send data, `-v` to watch the TLS handshake and headers.
 
-## 6. wget
+![curl](screenshots/curl.png)
+
+## 6. wget - download a file
+
 ```bash
-wget https://example.com/index.html
+wget https://example.com/
+wget -O page.html -q https://example.com/
 ```
-Downloads files from the internet over HTTP, HTTPS, or FTP. Unlike curl, it saves the file to disk by default.
 
-**What I understood:** `wget` is for downloading files/pages directly to my machine.
+`wget` resolves the host, connects on 443, reports the `200 OK`, and saves the body to disk
+(`index.html`, 559 bytes). `-O` picks the output name and `-q` silences the progress output.
 
-![wget output](screenshots/wget.png)
+Takeaway: where `curl` prints to stdout by default, `wget` writes files by default and can
+resume (`-c`) or mirror a site (`-r`). Both do the same job for a single file.
 
-## 7. nslookup / dig
+![wget](screenshots/wget.png)
+
+## 7. nslookup and dig - DNS lookups
+
 ```bash
-nslookup google.com
+nslookup github.com
+dig +short github.com
 ```
-Queries DNS to resolve a domain name into its IP address (and vice versa).
 
-**What I understood:** This shows how a website name gets translated into an IP address by DNS. If this fails, the site name cannot be resolved.
+`nslookup` shows which resolver answered (the network's DNS server at `100.128.160.1`) and the
+A record it returned. `dig +short` prints only the answer, which is handy in scripts. Without `+short`,
+`dig` prints the full query/answer sections with TTLs.
 
-![nslookup output](screenshots/nslookup.png)
+Takeaway: when a site is "down" but `ping 1.1.1.1` works, DNS is the first suspect.
 
-## 8. traceroute
+![nslookup](screenshots/nslookup.png)
+
+## 8. traceroute - the path to a host
+
 ```bash
-traceroute google.com
+traceroute -m 15 -w 2 github.com
 ```
-Shows the full path (each router/hop) that packets take to reach a destination, with the time at each hop.
 
-**What I understood:** It shows every stop between my machine and the destination, which helps find where a connection slows down or breaks.
+Sends probes with increasing TTL so each router along the way replies once, printing one hop
+per line with three timings. Hops that show `* * *` are routers that do not answer probes;
+that is normal on the public internet. `-m 15` caps the hop count and `-w 2` shortens the wait.
 
-![traceroute output](screenshots/traceroute.png)
+Takeaway: useful for spotting *where* latency appears, not just that it exists.
 
-## 9. hostname
+![traceroute](screenshots/traceroute.png)
+
+## 9. hostname - who am I on the network?
+
 ```bash
 hostname
-hostname -I
+hostname -f
+ipconfig getifaddr en0      # macOS; on Linux use: hostname -I
 ```
-Prints the name of the machine. `-I` prints its IP address(es).
 
-**What I understood:** A quick way to see the machine's name and IP.
+Prints the machine's name, its fully qualified form, and the IPv4 address on the active
+interface. On Linux `hostname -I` prints all addresses in one line.
 
-![hostname output](screenshots/hostname.png)
+![hostname](screenshots/hostname.png)

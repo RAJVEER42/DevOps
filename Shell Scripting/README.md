@@ -1,111 +1,89 @@
-# System Information Script
+# Shell Scripting - sysinfo.sh
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
 
-A shell script that prints basic system information, takes input from the user, creates a directory and file, and saves the running processes into that file using output redirection.
+A small Bash script that summarises the machine it runs on, asks where to put a report, and
+writes the full process list to that report with output redirection.
 
-## What the script does
-- Prints the current date
-- Prints the hostname
-- Prints the username
-- Prints the disk usage
-- Prints the running processes
-- Uses variables to store and reuse data
-- Takes user input using `read -p`
-- Creates a directory using `mkdir`
-- Creates a file using `touch`
-- Saves the running processes into the file using `>` output redirection
+## Requirements covered
 
-## Commands used
-`mkdir`, `touch`, `echo`, `df`, `ps`, `read -p`, variables, `>` output redirection
+| Requirement | How the script does it |
+|---|---|
+| Print date, hostname, user | `date`, `hostname`, `whoami` captured with `$(...)` |
+| Show disk usage | `df -h`, plus a one-line summary parsed with `awk` |
+| Show running processes | `ps aux`, sorted by CPU, top 10 |
+| Use variables | `today`, `box`, `me`, `disk`, `proc_count`, `report_dir`, `report_file` |
+| Read user input | two `read -p` prompts |
+| Create a directory | `mkdir -p "$report_dir"` |
+| Create a file | `touch "$report_dir/$report_file"` |
+| Redirect output to the file | `ps aux > "$report_dir/$report_file"` |
 
-## The script (sysinfo.sh)
+## The script
+
 ```bash
 #!/bin/bash
-# System Information Script
+# sysinfo.sh - print a quick system summary, then save the process list
+# to a file whose location the user chooses at runtime.
 
-# Store data in variables
-CURRENT_DATE=$(date)
-HOST_NAME=$(hostname)
-USER_NAME=$(whoami)
+today=$(date)
+box=$(hostname)
+me=$(whoami)
+disk=$(df -h / | awk 'NR==2 {print $5 " used of " $2}')
+proc_count=$(ps aux | wc -l | tr -d ' ')
 
-echo "=============================="
-echo " SYSTEM INFORMATION"
-echo "=============================="
+echo "=== System summary ==="
+echo "Date        : $today"
+echo "Host        : $box"
+echo "User        : $me"
+echo "Root disk   : $disk"
+echo "Processes   : $proc_count running"
+echo
 
-echo "Current Date : $CURRENT_DATE"
-echo "Hostname     : $HOST_NAME"
-echo "Username     : $USER_NAME"
-
-echo ""
-echo "----- Disk Usage -----"
+echo "--- Disk usage (df -h) ---"
 df -h
+echo
 
-echo ""
-echo "----- Running Processes -----"
-ps aux
+echo "--- Top 10 processes by CPU ---"
+ps aux | sort -rk 3 | head -n 10 | cut -c1-110
+echo
 
-# Take input from the user
-read -p "Enter a name for the report directory: " DIR_NAME
-read -p "Enter a name for the report file: " FILE_NAME
+read -p "Directory to save the report in: " report_dir
+read -p "Report file name: " report_file
 
-# Create directory and file
-mkdir -p "$DIR_NAME"
-touch "$DIR_NAME/$FILE_NAME"
+mkdir -p "$report_dir"
+touch "$report_dir/$report_file"
 
-# Store running processes in the file using output redirection
-ps aux > "$DIR_NAME/$FILE_NAME"
+# Full process list goes to the file with > redirection
+ps aux > "$report_dir/$report_file"
 
-echo ""
-echo "Running processes saved to: $DIR_NAME/$FILE_NAME"
+echo
+echo "Saved $(wc -l < "$report_dir/$report_file" | tr -d ' ') lines of process data to $report_dir/$report_file"
 ```
 
-## How to run
+A few choices worth noting:
+
+- Variables are quoted everywhere they are expanded, so a directory name with a space works.
+- `mkdir -p` does not fail if the directory already exists, so the script can be re-run.
+- `sort -rk 3` sorts on the third column of `ps aux` (%CPU) descending; `cut -c1-110` keeps
+  long command lines from wrapping on screen. The file gets the untrimmed list.
+- `>` truncates and rewrites the report each run. Swapping it for `>>` would append instead.
+
+## Running it
+
 ```bash
 chmod +x sysinfo.sh
 ./sysinfo.sh
 ```
 
-## Sample output
-```
-==============================
- SYSTEM INFORMATION
-==============================
-Current Date : Wed Sep  2 21:38:56 IST 2026
-Hostname     : my-machine
-Username     : student
+When prompted I entered `reports` for the directory and `processes.txt` for the file.
 
------ Disk Usage -----
-Filesystem      Size  Used Avail Use% Mounted on
-/dev/sda1        50G   16G   32G  34% /
-tmpfs           2.0G     0  2.0G   0% /dev/shm
+Summary block, disk usage, and the top processes:
 
------ Running Processes -----
-USER     PID  %CPU %MEM    VSZ   RSS TTY   STAT START   TIME COMMAND
-root       1   0.0  0.1 168000 11000 ?     Ss   09:10   0:01 /sbin/init
-student  842   0.3  0.5  95000 40000 pts/0 S+   09:38   0:00 bash sysinfo.sh
-...
+![script output](screenshots/script-output.png)
 
-Enter a name for the report directory: reports
-Enter a name for the report file: processes.txt
+The report that was written, checked with `ls`, `head` and `wc -l`:
 
-Running processes saved to: reports/processes.txt
-```
+![saved report](screenshots/saved-report.png)
 
-## Result
-After running, a `reports/` directory is created containing `processes.txt`, which holds the full `ps aux` output captured with `>` redirection.
-
-## Screenshots
-
-Script run showing the current date, hostname, username, disk usage, and running processes:
-
-![System information output](screenshots/image.png)
-
-End of the process list, the `read -p` input prompts, and the confirmation that the file was saved:
-
-![User input and saved confirmation](<screenshots/image copy.png>)
-
-Contents of the created file, confirming the running processes were saved with `>` redirection:
-
-![Saved processes file](<screenshots/image copy 2.png>)
+The `reports/` directory is a run-time artefact and is not committed.

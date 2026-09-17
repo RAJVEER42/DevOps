@@ -1,31 +1,21 @@
-# DevOps
+# DevOps Coursework
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
 
-Coursework and practice notes for DevOps fundamentals. Each folder is a self-contained
-topic with its own write-up, commands, and screenshots of the actual output.
-
-## Contents
+Hands-on notes and code for the DevOps module, one folder per topic. Each folder has its own
+README with the commands that were run, the output, and screenshots from the run.
 
 | Folder | Topic |
 |---|---|
-| [Linux Fundamentals](Linux%20Fundamentals/) | Hard/soft links, `useradd` vs `adduser`, `journalctl`, command cheat sheet |
-| [Networking Fundamentals](Networking%20Fundamentals/) | `ping`, `curl`, `wget`, `ip`, `ss`, `nslookup`, `traceroute`, `hostname` |
-| [Shell Scripting](Shell%20Scripting/) | System information script with user input and output redirection |
-| [Git and Github](Git%20and%20Github/) | `git commit -a -m` vs `git commit -m`, `git cherry-pick` |
-| [Docker Fundamentals](Docker%20Fundamentals/) | Six "Hello World" apps containerized: Apache, nginx, Node.js, Python, Java, React |
-| [DockerFiles and Images](DockerFiles%20and%20Images/) | Multi-stage builds and image size optimization |
-| [Docker Networks](Docker%20Networks/) | Container networking, host network, bind mounts, overlay networks |
+| `Linux Fundamentals/` | Hard vs soft links, `useradd` vs `adduser`, `journalctl`, command cheat sheet |
+| `Shell Scripting/` | `sysinfo.sh`: variables, user input, `mkdir`/`touch`, output redirection |
+| `Networking Fundamentals/` | `ping`, `ip`, `ss`, `curl`, `wget`, `nslookup`, `traceroute`, `hostname` |
+| `Git and Github/` | `git commit -a` vs `-m`, `git cherry-pick` |
+| `Docker Fundamentals/` | Six Hello World containers: Node.js, Python, Java, Apache, React, Nginx |
+| `DockerFiles and Images/` | Multi-stage Go build, 365 MB toolchain to a 7 MB image |
+| `Docker Networks/` | Multi-network containers, host network, bind mounts, overlay networks |
+| `Kubernetes Services/` | ClusterIP, NodePort, LoadBalancer, Headless and ExternalName Services on Minikube |
 
-## Layout
-
-Every topic follows the same structure:
-
-```
-Topic Name/
-├── README.md        # write-up: explanation, commands, output
-└── screenshots/     # captured terminal and browser output
-```
-
-Docker topics additionally contain the application source and its `Dockerfile`.
+Environment: macOS with Docker Desktop; Linux-only commands were run in Ubuntu 24.04 containers.
+The Kubernetes work used Minikube with the Docker driver.
