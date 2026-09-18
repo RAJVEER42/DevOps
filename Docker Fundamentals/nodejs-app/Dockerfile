@@ -1,18 +1,11 @@
-# Use an official Node.js runtime as the base image
 FROM node:20-alpine
 
-# Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copy package.json and install dependencies (none here, but good practice)
-COPY package.json ./
-RUN npm install
+# No third-party packages are needed; the built-in http module is enough.
+COPY package.json app.js ./
 
-# Copy the application code
-COPY app.js ./
-
-# Expose the port the app runs on
+ENV PORT=3000
 EXPOSE 3000
 
-# Command to start the app
-CMD ["npm", "start"]
+CMD ["node", "app.js"]

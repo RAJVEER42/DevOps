@@ -1,21 +1,13 @@
-# ---- Stage 1: Build the React app ----
-FROM node:20-alpine AS build
-
+# Stage 1: install dependencies and produce the static bundle
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Install dependencies
 COPY package.json ./
 RUN npm install
-
-# Copy source and build the production bundle
-COPY public ./public
+COPY index.html vite.config.js ./
 COPY src ./src
 RUN npm run build
 
-# ---- Stage 2: Serve the build with Nginx ----
+# Stage 2: ship only the built files on a tiny web server
 FROM nginx:alpine
-
-# Copy the built static files into Nginx's web root
-COPY --from=build /app/build /usr/share/nginx/html
-
+COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80

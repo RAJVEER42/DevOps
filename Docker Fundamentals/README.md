@@ -1,97 +1,117 @@
-# Docker Fundamentals - Hello World Applications
+# Docker Fundamentals - six Hello World containers
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
 
-Six simple "Hello World" applications, each containerized with its own Dockerfile.
+The same "Hello World" page served six different ways, each with its own Dockerfile. All six
+images were built and run together on one machine; the screenshots are from that run.
 
-## Folder structure
+## Layout
+
 ```
 Docker Fundamentals/
-├── nodejs-app/     Node.js (built-in http server)
-├── python-app/     Python (Flask)
-├── java-app/       Java (built-in HttpServer)
-├── Apache-app/     Apache HTTP Server (static page)
-├── React-app/      React (built + served by Nginx)
-└── nginx-app/      Nginx (static page)
+├── nodejs-app/    Node.js 20, built-in http module, no dependencies
+├── python-app/    Python 3.12 + Flask
+├── java-app/      Java 21, JDK's built-in HttpServer, compiled during the build
+├── Apache-app/    httpd 2.4 serving a static page
+├── React-app/     React 18 + Vite, built in stage 1, served by Nginx in stage 2
+└── nginx-app/     Nginx serving a static page
 ```
 
-## Ports summary
-| App | Container port | Example run command |
-|---|---|---|
-| nodejs-app | 3000 | `docker run -p 3000:3000 nodejs-app` |
-| python-app | 5000 | `docker run -p 5000:5000 python-app` |
-| java-app | 8080 | `docker run -p 8080:8080 java-app` |
-| Apache-app | 80 | `docker run -p 8081:80 apache-app` |
-| React-app | 80 | `docker run -p 8082:80 react-app` |
-| nginx-app | 80 | `docker run -p 8083:80 nginx-app` |
+## Ports
 
-## Build and run each app
-Run these from inside each app's folder.
+Each container listens on its natural port. Host ports were chosen to avoid clashes; port 5000
+on macOS is taken by AirPlay Receiver, so Flask is exposed on 5001.
 
-### nodejs-app
+| App | Image tag | Container port | Host port | URL |
+|---|---|---|---|---|
+| Node.js | `nodejs-app` | 3000 | 3000 | http://localhost:3000 |
+| Python / Flask | `python-app` | 5000 | 5001 | http://localhost:5001 |
+| Java | `java-app` | 8080 | 8080 | http://localhost:8080 |
+| Apache | `apache-app` | 80 | 8081 | http://localhost:8081 |
+| React | `react-app` | 80 | 8082 | http://localhost:8082 |
+| Nginx | `nginx-app` | 80 | 8083 | http://localhost:8083 |
+
+## Build and run everything
+
+From this directory:
+
 ```bash
-cd nodejs-app
-docker build -t nodejs-app .
-docker run -d -p 3000:3000 nodejs-app
-# open http://localhost:3000
+docker build -t nodejs-app ./nodejs-app
+docker build -t python-app ./python-app
+docker build -t java-app   ./java-app
+docker build -t apache-app ./Apache-app
+docker build -t react-app  ./React-app
+docker build -t nginx-app  ./nginx-app
+
+docker run -d --name hello-node   -p 3000:3000 nodejs-app
+docker run -d --name hello-python -p 5001:5000 python-app
+docker run -d --name hello-java   -p 8080:8080 java-app
+docker run -d --name hello-apache -p 8081:80   apache-app
+docker run -d --name hello-react  -p 8082:80   react-app
+docker run -d --name hello-nginx  -p 8083:80   nginx-app
+
+docker ps --filter name=hello-
 ```
 
-### python-app
+Tear down:
+
 ```bash
-cd python-app
-docker build -t python-app .
-docker run -d -p 5000:5000 python-app
-# open http://localhost:5000
+docker rm -f hello-node hello-python hello-java hello-apache hello-react hello-nginx
 ```
 
-### java-app
-```bash
-cd java-app
-docker build -t java-app .
-docker run -d -p 8080:8080 java-app
-# open http://localhost:8080
-```
+## Notes on each Dockerfile
 
-### Apache-app
-```bash
-cd Apache-app
-docker build -t apache-app .
-docker run -d -p 8081:80 apache-app
-# open http://localhost:8081
-```
+**nodejs-app** - `node:20-alpine`, copies `package.json` and `app.js`, runs `node app.js`.
+There is no `npm install` because the http module ships with Node. `.dockerignore` keeps
+`node_modules` out of the build context.
 
-### React-app
-```bash
-cd React-app
-docker build -t react-app .
-docker run -d -p 8082:80 react-app
-# open http://localhost:8082
-```
+**python-app** - `python:3.12-slim`. Requirements are copied and installed *before* the
+application code so the pip layer is cached when only `app.py` changes. Flask binds to
+`0.0.0.0`, otherwise it would only listen inside the container.
 
-### nginx-app
-```bash
-cd nginx-app
-docker build -t nginx-app .
-docker run -d -p 8083:80 nginx-app
-# open http://localhost:8083
-```
+**java-app** - `eclipse-temurin:21-jdk`. `javac Main.java` runs at build time, so the image
+contains the compiled class. The server uses `com.sun.net.httpserver`, which is part of the
+JDK, so there is no Maven or Gradle to set up.
 
-## Useful Docker commands
-```bash
-docker images            # list built images
-docker ps                # list running containers
-docker stop <container>  # stop a container
-docker rm <container>    # remove a container
-docker logs <container>  # view container logs
-```
+**Apache-app** - `httpd:2.4`. One `COPY` into `/usr/local/apache2/htdocs/`.
+
+**React-app** - two stages. `node:20-alpine` installs dependencies and runs `vite build`;
+`nginx:alpine` copies the resulting `dist/` folder. The Node toolchain never reaches the final
+image, which is why `react-app` and `nginx-app` end up almost the same size.
+
+**nginx-app** - `nginx:alpine`. One `COPY` into `/usr/share/nginx/html/`.
+
+## Image sizes from the run
+
+| Image | Size |
+|---|---|
+| nginx-app | 92.7 MB |
+| react-app | 92.9 MB |
+| nodejs-app | 194 MB |
+| apache-app | 205 MB |
+| python-app | 234 MB |
+| java-app | 744 MB |
+
+The Java image is large because it carries a full JDK. Swapping the runtime stage to a JRE image
+or using `jlink` would shrink it considerably; that is the same idea the React build uses.
+
+## Verifying with curl
+
+Five of the six return `<h1>Hello World</h1>` straight from `curl`. The React app returns an
+HTML shell with a `<script type="module">` tag; the heading is rendered by JavaScript in the
+browser, which is why the browser screenshot is the real check for that one.
 
 ## Screenshots
-Add a screenshot of each app showing "Hello World" in the browser, plus the build/run terminal output.
 
-- Node.js: ![nodejs](screenshots/nodejs.png)
-- Python: ![python](screenshots/python.png)
-- Java: ![java](screenshots/java.png)
-- Apache: ![apache](screenshots/apache.png)
-- React: ![react](screenshots/react.png)
-- Nginx: ![nginx](screenshots/nginx.png)
+Build, run, `docker ps`, `curl` checks and image sizes:
+
+![build and run](screenshots/build-and-run.png)
+
+Each app in the browser:
+
+| | |
+|---|---|
+| Node.js ![node](screenshots/nodejs.png) | Python ![python](screenshots/python.png) |
+| Java ![java](screenshots/java.png) | Apache ![apache](screenshots/apache.png) |
+| React ![react](screenshots/react.png) | Nginx ![nginx](screenshots/nginx.png) |

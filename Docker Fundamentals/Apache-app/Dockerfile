@@ -1,8 +1,6 @@
-# Use the official Apache HTTP Server image
 FROM httpd:2.4
 
-# Copy our HTML file into Apache's default web root
-COPY index.html /usr/local/apache2/htdocs/
+# httpd serves files from htdocs by default
+COPY index.html /usr/local/apache2/htdocs/index.html
 
-# Apache serves on port 80 by default
 EXPOSE 80
