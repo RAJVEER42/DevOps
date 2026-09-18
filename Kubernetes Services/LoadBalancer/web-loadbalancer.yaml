@@ -1,0 +1,13 @@
+# Asks the cloud provider for an external load balancer. Builds on NodePort + ClusterIP.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: web
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

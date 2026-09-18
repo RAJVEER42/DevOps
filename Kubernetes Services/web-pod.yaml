@@ -1,0 +1,14 @@
+# One Nginx Pod. Every Service in this folder (except ExternalName) selects it via app=web.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80
+          name: http

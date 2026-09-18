@@ -1,0 +1,13 @@
+# clusterIP: None -> no virtual IP, no proxying. DNS returns the Pod IPs themselves.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-headless
+spec:
+  clusterIP: None
+  selector:
+    app: web
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
