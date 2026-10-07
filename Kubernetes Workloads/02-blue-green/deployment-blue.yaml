@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shop-bg
+  template:
+    metadata:
+      labels:
+        app: shop-bg
+        version: blue
+        color: blue
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo:1.0
+          args: ["-listen=:8080", "-text=BLUE v1 is serving"]
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 3

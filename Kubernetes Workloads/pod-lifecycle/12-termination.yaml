@@ -1,0 +1,16 @@
+# On delete, kubelet runs the preStop hook, then sends SIGTERM, then waits up to
+# terminationGracePeriodSeconds before SIGKILL. The app traps SIGTERM and logs it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lc-terminate
+spec:
+  terminationGracePeriodSeconds: 20
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c", "trap 'echo SIGTERM received, finishing in-flight work; sleep 5; echo clean exit; exit 0' TERM; echo running; while true; do sleep 1; done"]
+      lifecycle:
+        preStop:
+          exec:
+            command: ["sh", "-c", "echo preStop hook ran"]

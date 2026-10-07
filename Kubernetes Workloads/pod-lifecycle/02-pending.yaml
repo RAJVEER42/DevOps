@@ -1,0 +1,13 @@
+# Asks for far more memory than the node has. The scheduler can never place it, so it stays Pending.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lc-pending
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
+      resources:
+        requests:
+          memory: "64Gi"
+          cpu: "16"

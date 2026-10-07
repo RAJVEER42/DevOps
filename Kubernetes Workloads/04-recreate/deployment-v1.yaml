@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-batch
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shop-batch
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: shop-batch
+        version: v1
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo:1.0
+          args: ["-listen=:8080", "-text=shop-batch says hello from v1"]
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 3

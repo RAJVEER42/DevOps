@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-bg
+spec:
+  selector:
+    app: shop-bg
+    color: blue
+  ports:
+    - port: 80
+      targetPort: 8080

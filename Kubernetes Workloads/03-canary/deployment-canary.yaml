@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-canary
+  template:
+    metadata:
+      labels:
+        app: shop-canary
+        version: canary
+        track: canary
+    spec:
+      containers:
+        - name: echo
+          image: hashicorp/http-echo:1.0
+          args: ["-listen=:8080", "-text=CANARY v2"]
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 3

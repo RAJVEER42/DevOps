@@ -1,0 +1,22 @@
+# Two containers in one Pod share the network namespace and an emptyDir volume.
+# The sidecar writes a timestamp every 5s; nginx serves the file it writes.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lc-sidecar
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
+      volumeMounts:
+        - name: shared
+          mountPath: /usr/share/nginx/html
+    - name: writer
+      image: busybox:1.36
+      command: ["sh", "-c", "while true; do date > /shared/index.html; sleep 5; done"]
+      volumeMounts:
+        - name: shared
+          mountPath: /shared
+  volumes:
+    - name: shared
+      emptyDir: {}

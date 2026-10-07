@@ -1,0 +1,18 @@
+# The container is up immediately, but the readiness probe only passes once /tmp/ready exists
+# (created after 20s). Until then the Pod is Running but READY 0/1 and gets no Service traffic.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lc-readiness
+  labels:
+    app: lc-readiness
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 20; touch /tmp/ready; sleep 3600"]
+      readinessProbe:
+        exec:
+          command: ["cat", "/tmp/ready"]
+        initialDelaySeconds: 2
+        periodSeconds: 3
