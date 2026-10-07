@@ -1,0 +1,11 @@
+# Bug: the start command references a config file that is not in the image. The process exits 1,
+# kubelet restarts it with back-off. Status: CrashLoopBackOff.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: billing-crash
+spec:
+  containers:
+    - name: billing
+      image: busybox:1.36
+      command: ["sh", "-c", "echo 'loading /etc/billing/config.yaml'; cat /etc/billing/config.yaml || exit 1; echo 'serving'; sleep 3600"]

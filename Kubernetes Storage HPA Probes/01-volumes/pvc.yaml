@@ -1,0 +1,13 @@
+# A claim asks for storage by size and access mode. storageClassName: manual makes it bind to
+# the hand-made PV above rather than trigger dynamic provisioning.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-manual
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi

@@ -1,0 +1,44 @@
+# cpu-burn hashes in a loop on every request, so load translates directly into CPU.
+# resources.requests is required: HPA utilisation is a percentage of the request.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-burn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu-burn
+  template:
+    metadata:
+      labels:
+        app: cpu-burn
+    spec:
+      containers:
+        - name: app
+          image: cpu-burn:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 200m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cpu-burn
+spec:
+  selector:
+    app: cpu-burn
+  ports:
+    - port: 80
+      targetPort: 8080

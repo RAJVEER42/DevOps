@@ -1,0 +1,12 @@
+# No storageClassName: the cluster's default StorageClass provisions a PV automatically.
+# On Minikube that is the "standard" class backed by the hostpath provisioner.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-dynamic
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: checkout
+spec:
+  containers:
+    - name: checkout
+      image: nginx:1.27-alpine-slim
+      ports:
+        - containerPort: 80

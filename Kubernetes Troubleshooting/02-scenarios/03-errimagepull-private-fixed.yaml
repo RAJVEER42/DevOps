@@ -1,0 +1,12 @@
+# Fix: a docker-registry Secret holding a token that can read the package, referenced by the Pod.
+#   kubectl create secret docker-registry ghcr-pull --docker-server=ghcr.io --docker-username=<user> --docker-password=<token>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-private
+spec:
+  imagePullSecrets:
+    - name: ghcr-pull
+  containers:
+    - name: web
+      image: ghcr.io/jils31/internal-billing:1.0

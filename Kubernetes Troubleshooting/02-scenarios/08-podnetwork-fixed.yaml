@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shop-api-probe
+  labels:
+    app: shop-api-probe
+spec:
+  containers:
+    - name: api
+      image: hashicorp/http-echo:1.0
+      args: ["-listen=:8080", "-text=probe demo"]
+      ports:
+        - containerPort: 8080
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-api-probe
+spec:
+  selector:
+    app: shop-api-probe
+  ports:
+    - port: 80
+      targetPort: 8080

@@ -1,0 +1,11 @@
+# Reported: "the new checkout Pod never starts".
+apiVersion: v1
+kind: Pod
+metadata:
+  name: checkout
+spec:
+  containers:
+    - name: checkout
+      image: nginx:1.27-alpine-slim-does-not-exist
+      ports:
+        - containerPort: 80

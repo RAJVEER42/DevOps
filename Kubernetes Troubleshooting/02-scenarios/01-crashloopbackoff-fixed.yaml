@@ -1,0 +1,26 @@
+# Fix: provide the config via a ConfigMap volume at the path the app expects.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: billing-config
+data:
+  config.yaml: |
+    currency: INR
+    tax_rate: 0.18
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: billing-crash
+spec:
+  containers:
+    - name: billing
+      image: busybox:1.36
+      command: ["sh", "-c", "echo 'loading /etc/billing/config.yaml'; cat /etc/billing/config.yaml || exit 1; echo 'serving'; sleep 3600"]
+      volumeMounts:
+        - name: cfg
+          mountPath: /etc/billing
+  volumes:
+    - name: cfg
+      configMap:
+        name: billing-config

@@ -1,0 +1,26 @@
+# Bugs: an env var comes from a Secret key that does not exist (DB_PASS vs DB_PASSWORD), and the
+# command has a typo. The first blocks container creation (CreateContainerConfigError); once that is
+# fixed, the second makes the container exit immediately.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payments-db
+type: Opaque
+stringData:
+  DB_PASSWORD: demo-only
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: payments-config
+spec:
+  containers:
+    - name: payments
+      image: busybox:1.36
+      command: ["sh", "-c", "echo starting with password length ${#DB_PASSWORD}; slep 3600"]
+      env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: payments-db
+              key: DB_PASS

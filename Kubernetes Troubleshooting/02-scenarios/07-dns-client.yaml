@@ -1,0 +1,10 @@
+# A client with dig, nslookup and curl for DNS and connectivity checks.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: net-debug
+spec:
+  containers:
+    - name: tools
+      image: alpine:3.20
+      command: ["sh", "-c", "apk add -q bind-tools curl && touch /ready && sleep 3600"]
