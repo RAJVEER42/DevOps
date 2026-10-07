@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-echo
+  labels:
+    app.kubernetes.io/name: echo
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: echo
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: echo
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        # changes whenever the message changes, so a values-only upgrade still rolls the Pods
+        checksum/message: {{ .Values.message | sha256sum }}
+    spec:
+      containers:
+        - name: echo
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          args: ["-listen=:{{ .Values.service.targetPort }}", "-text={{ .Values.message }}"]
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.targetPort }}

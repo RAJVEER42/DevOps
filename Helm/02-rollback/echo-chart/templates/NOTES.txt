@@ -1,0 +1,3 @@
+{{ .Release.Name }} is up. Revision {{ .Release.Revision }} answers: "{{ .Values.message }}"
+Test from inside the cluster:
+  kubectl run tmp --rm -it --restart=Never --image=curlimages/curl:8.10.1 -- curl -s http://{{ .Release.Name }}-echo

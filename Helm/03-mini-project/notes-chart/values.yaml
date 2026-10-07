@@ -1,0 +1,25 @@
+# Defaults are the development profile. values-prod.yaml overrides what differs.
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.26-alpine"
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30090
+
+app:
+  name: notes
+  environment: development
+  # rendered into the landing page so the running environment is visible in a browser
+  banner: "Notes (dev)"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 64Mi

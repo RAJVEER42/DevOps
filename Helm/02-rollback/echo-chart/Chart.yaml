@@ -1,0 +1,6 @@
+apiVersion: v2
+name: echo-chart
+description: A tiny HTTP echo service used to practise upgrade and rollback
+type: application
+version: 0.1.0
+appVersion: "1.0"

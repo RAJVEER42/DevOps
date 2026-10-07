@@ -1,0 +1,30 @@
+# Bug: the readiness probe checks port 80 but the container listens on 8080. The Pod runs but
+# never becomes Ready, so the Service never sends it traffic.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shop-api-probe
+  labels:
+    app: shop-api-probe
+spec:
+  containers:
+    - name: api
+      image: hashicorp/http-echo:1.0
+      args: ["-listen=:8080", "-text=probe demo"]
+      ports:
+        - containerPort: 8080
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-api-probe
+spec:
+  selector:
+    app: shop-api-probe
+  ports:
+    - port: 80
+      targetPort: 8080

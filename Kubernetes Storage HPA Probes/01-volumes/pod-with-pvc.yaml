@@ -1,0 +1,17 @@
+# The Pod references the claim, not the volume. It never needs to know where the disk is.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vol-pvc-user
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c", "echo \"$(date) pod $(hostname) started\" >> /mnt/state/history.txt; cat /mnt/state/history.txt; sleep 3600"]
+      volumeMounts:
+        - name: state
+          mountPath: /mnt/state
+  volumes:
+    - name: state
+      persistentVolumeClaim:
+        claimName: pvc-manual

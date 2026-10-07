@@ -1,0 +1,75 @@
+# A healthy two-replica app plus a chatty logger, used to practise the read-only commands.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+  labels:
+    app: shop-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shop-api
+  template:
+    metadata:
+      labels:
+        app: shop-api
+        tier: backend
+    spec:
+      containers:
+        - name: api
+          image: hashicorp/http-echo:1.0
+          args: ["-listen=:8080", "-text=shop-api ok"]
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              cpu: 20m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 32Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-api
+spec:
+  selector:
+    app: shop-api
+  ports:
+    - port: 80
+      targetPort: http
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: order-worker
+  labels:
+    app: order-worker
+spec:
+  containers:
+    - name: worker
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          echo "worker starting"
+          echo "connecting to queue..."
+          echo "queue connected"
+          i=0
+          while true; do
+            i=$((i+1))
+            if [ $((i % 7)) -eq 0 ]; then echo "WARN order $i took 2.3s (slow)"; else echo "processed order $i"; fi
+            sleep 3
+          done
+      resources:
+        requests:
+          cpu: 10m
+          memory: 8Mi

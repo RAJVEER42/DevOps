@@ -1,0 +1,11 @@
+# Reported: "the storefront Service returns connection refused". Something here is wrong.
+apiVersion: v1
+kind: Service
+metadata:
+  name: storefront
+spec:
+  selector:
+    app: store-front
+  ports:
+    - port: 80
+      targetPort: 8080

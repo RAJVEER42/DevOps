@@ -1,0 +1,12 @@
+# Bugs: the Service selector uses app=shopapi (Pods are app=shop-api) and targetPort is 80
+# (the container listens on 8080). Either one alone breaks connectivity.
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-api-broken
+spec:
+  selector:
+    app: shopapi
+  ports:
+    - port: 80
+      targetPort: 80

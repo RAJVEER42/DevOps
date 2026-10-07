@@ -1,0 +1,19 @@
+# hostPath: a directory on the node. Survives the Pod but ties data to one node. Fine for
+# node agents, risky for apps. The path here is inside the Minikube node container.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vol-hostpath
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c", "echo \"written by $(hostname) at $(date)\" >> /node-data/notes.txt; cat /node-data/notes.txt; sleep 3600"]
+      volumeMounts:
+        - name: node-dir
+          mountPath: /node-data
+  volumes:
+    - name: node-dir
+      hostPath:
+        path: /tmp/vol-lab
+        type: DirectoryOrCreate

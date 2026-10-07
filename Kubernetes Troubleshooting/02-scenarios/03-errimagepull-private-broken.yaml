@@ -1,0 +1,10 @@
+# Bug: the image is in a registry namespace we have no access to and the Pod has no
+# imagePullSecret. The registry answers "denied" instead of "not found". Status: ErrImagePull.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-private
+spec:
+  containers:
+    - name: web
+      image: ghcr.io/jils31/internal-billing:1.0

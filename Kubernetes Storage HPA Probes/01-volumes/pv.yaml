@@ -1,0 +1,16 @@
+# A PersistentVolume provisioned by hand (static provisioning). In a cloud this would be an
+# EBS/PD disk; here it is a hostPath on the single node. Retain keeps the data when the claim goes.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-manual-1g
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /tmp/pv-manual-1g
+    type: DirectoryOrCreate

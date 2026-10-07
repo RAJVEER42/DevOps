@@ -1,0 +1,9 @@
+# Bug: tag typo. nginx:1.27-alpnie does not exist. Status: ErrImagePull then ImagePullBackOff.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-badtag
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpnie

@@ -1,0 +1,60 @@
+# nginx with the PVC mounted at /data so notes written there survive Pod replacement.
+# Three probes with distinct jobs: startup (tolerate slow boot), readiness (gate traffic),
+# liveness (restart when wedged). Recreate strategy because the PVC is ReadWriteOnce.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-web
+  namespace: notes-prod
+  labels:
+    app: notes-web
+spec:
+  replicas: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: notes-web
+  template:
+    metadata:
+      labels:
+        app: notes-web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 64Mi
+          volumeMounts:
+            - name: notes
+              mountPath: /data
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30        # up to 60s to come up before liveness kicks in
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+      volumes:
+        - name: notes
+          persistentVolumeClaim:
+            claimName: notes-data

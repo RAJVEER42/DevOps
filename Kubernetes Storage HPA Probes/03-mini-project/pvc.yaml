@@ -1,0 +1,12 @@
+# Claims 500Mi from the default StorageClass. The Deployment mounts it at /data.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: notes-data
+  namespace: notes-prod
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi

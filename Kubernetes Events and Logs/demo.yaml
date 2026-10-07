@@ -1,0 +1,19 @@
+# One healthy app that writes logs, one Pod whose image cannot be pulled, so both signals have content.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logger
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c", "echo 'service starting'; echo 'config loaded: region=ap-south-1'; n=0; while true; do n=$((n+1)); echo \"$(date +%T) handled request $n\"; sleep 4; done"]
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken-image
+spec:
+  containers:
+    - name: app
+      image: busybox:does-not-exist
