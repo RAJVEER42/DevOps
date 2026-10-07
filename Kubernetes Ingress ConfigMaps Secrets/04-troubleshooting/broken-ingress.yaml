@@ -1,0 +1,19 @@
+# Bug: the Ingress backend points at a Service port that the Service does not expose (8000 instead of 80)
+# and the service name has a typo (catalog-apii).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shop-broken
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: broken.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog-apii
+                port:
+                  number: 8000

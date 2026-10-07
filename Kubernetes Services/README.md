@@ -59,6 +59,12 @@ All five Services, their EndpointSlices, and the Pods:
 
 ![final state](screenshots/final-state.png)
 
+## Further documentation
+
+- [comparison/](comparison/): Deployment vs ReplicaSet, Deployment vs DaemonSet vs StatefulSet, ReplicaSet vs Service
+- [fqdn/](fqdn/): what an FQDN is, the Kubernetes DNS naming scheme, the per-Pod search list, with lookups run in this cluster
+- [coredns/](coredns/): how CoreDNS serves Service discovery, the Corefile line by line, and a DNS troubleshooting checklist
+
 ## Cleanup
 
 ```bash

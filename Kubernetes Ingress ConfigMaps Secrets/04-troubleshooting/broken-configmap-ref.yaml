@@ -1,0 +1,13 @@
+# Bug: the Pod references a ConfigMap name that does not exist (typo: catalog-confg).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: catalog-broken
+spec:
+  containers:
+    - name: api
+      image: catalog-api:1.0
+      imagePullPolicy: Never
+      envFrom:
+        - configMapRef:
+            name: catalog-confg
