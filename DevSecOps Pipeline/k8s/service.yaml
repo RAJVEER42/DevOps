@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: temp-service
+spec:
+  selector:
+    app: temp-service
+  ports:
+    - port: 80
+      targetPort: 5000
