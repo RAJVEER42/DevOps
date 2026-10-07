@@ -1,0 +1,11 @@
+# Copy to terraform.tfvars and edit. Credentials are NOT set here; use `aws configure`
+# or AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY in the environment.
+aws_region          = "ap-south-1"
+project             = "shop"
+environment         = "dev"
+vpc_cidr            = "10.20.0.0/16"
+public_subnet_cidrs = ["10.20.1.0/24", "10.20.2.0/24"]
+availability_zones  = ["ap-south-1a", "ap-south-1b"]
+admin_cidr          = "203.0.113.10/32" # replace with your own IP/32
+create_instance     = false
+use_localstack      = true
