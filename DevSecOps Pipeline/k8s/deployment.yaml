@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temp-service
+  labels:
+    app: temp-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: temp-service
+  template:
+    metadata:
+      labels:
+        app: temp-service
+    spec:
+      imagePullSecrets:
+        - name: ghcr          # created by the workflow; the GHCR package is private
+      containers:
+        - name: web
+          image: ghcr.io/OWNER/temp-service:latest   # the workflow substitutes the real owner and tag
+          ports:
+            - containerPort: 5000
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp          # gunicorn needs a writable temp dir; root fs is read-only
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            periodSeconds: 10
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi

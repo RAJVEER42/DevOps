@@ -1,0 +1,5 @@
+# gitleaks uses its default rule set; this file only adds an allowlist for the demo's
+# obviously fake placeholder in the README code block.
+[allowlist]
+  description = "documentation placeholders"
+  regexes = ['''EXAMPLE_PLACEHOLDER''']
