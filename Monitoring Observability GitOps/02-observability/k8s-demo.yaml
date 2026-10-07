@@ -1,0 +1,48 @@
+# The same instrumented app from 01-monitoring, run on Kubernetes with a Prometheus scrape
+# annotation and resource requests so kubectl top has something to report.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-metrics
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shop-metrics
+  template:
+    metadata:
+      labels:
+        app: shop-metrics
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: app
+          image: shop-metrics:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-metrics
+spec:
+  selector:
+    app: shop-metrics
+  ports:
+    - port: 80
+      targetPort: 8000

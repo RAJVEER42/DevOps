@@ -1,0 +1,22 @@
+# The one object applied by hand. It tells Argo CD which repo, which path and which branch
+# define the desired state, and that it may create the namespace and sync automatically.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello-gitops
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Jils31/DevOps.git
+    targetRevision: main
+    path: Monitoring Observability GitOps/03-gitops/app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-demo
+  syncPolicy:
+    automated:
+      prune: true        # delete cluster objects whose manifests were removed from Git
+      selfHeal: true     # revert manual kubectl edits back to what Git says
+    syncOptions:
+      - CreateNamespace=true

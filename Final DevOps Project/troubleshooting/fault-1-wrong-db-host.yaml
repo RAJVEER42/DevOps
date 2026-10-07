@@ -1,0 +1,3 @@
+# helm upgrade tracker helm/issue-tracker -f troubleshooting/fault-1-wrong-db-host.yaml
+# Overrides nothing except the database host, via the ConfigMap template's POSTGRES_HOST.
+postgresHostOverride: tracker-postgres-typo
