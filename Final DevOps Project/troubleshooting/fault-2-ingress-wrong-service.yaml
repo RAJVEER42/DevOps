@@ -1,0 +1,19 @@
+# kubectl apply -f troubleshooting/fault-2-ingress-wrong-service.yaml
+# The /api path points at a Service that does not exist (a typo from a "v2" rename that never happened).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tracker
+  namespace: issue-tracker
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: tracker.local
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend: { service: { name: tracker-backend-v2, port: { number: 80 } } }
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: tracker-frontend, port: { number: 80 } } }

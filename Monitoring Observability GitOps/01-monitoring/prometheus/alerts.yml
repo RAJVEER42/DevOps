@@ -1,0 +1,19 @@
+groups:
+  - name: shop
+    rules:
+      - alert: HighCheckoutErrorRate
+        expr: |
+          sum(rate(shop_http_requests_total{route="/checkout",status=~"5.."}[1m]))
+            / sum(rate(shop_http_requests_total{route="/checkout"}[1m])) > 0.10
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 10% of checkout requests are failing"
+      - alert: ShopDown
+        expr: up{job="shop-metrics"} == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: "shop-metrics is not being scraped"
