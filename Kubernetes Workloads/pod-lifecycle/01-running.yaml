@@ -1,0 +1,11 @@
+# A normal long-running container. Phase goes Pending -> Running and stays there.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lc-running
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80

@@ -1,0 +1,9 @@
+# The image tag does not exist. kubelet retries the pull with back-off: ErrImagePull -> ImagePullBackOff.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lc-imagepull
+spec:
+  containers:
+    - name: web
+      image: nginx:this-tag-does-not-exist

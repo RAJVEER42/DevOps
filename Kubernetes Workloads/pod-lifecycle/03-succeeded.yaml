@@ -1,0 +1,11 @@
+# Runs one command and exits 0. With restartPolicy Never the phase ends at Succeeded.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lc-succeeded
+spec:
+  restartPolicy: Never
+  containers:
+    - name: job
+      image: busybox:1.36
+      command: ["sh", "-c", "echo 'work done'; exit 0"]
