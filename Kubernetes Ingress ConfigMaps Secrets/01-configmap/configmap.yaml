@@ -1,0 +1,16 @@
+# Plain, non-secret settings. Two kinds of entry: simple key/values (used as env vars)
+# and a whole file (mounted into the container as /etc/app-config/features.ini).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-config
+data:
+  APP_ENV: "staging"
+  LOG_LEVEL: "debug"
+  FEATURE_DARK_MODE: "true"
+  ITEMS_PER_PAGE: "25"
+  features.ini: |
+    [features]
+    dark_mode = true
+    beta_search = false
+    items_per_page = 25

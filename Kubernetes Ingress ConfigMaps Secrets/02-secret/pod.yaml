@@ -1,0 +1,39 @@
+# Each secret key is mapped to an env var explicitly with secretKeyRef.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: catalog-secret-demo
+  labels:
+    app: catalog-secret-demo
+spec:
+  containers:
+    - name: api
+      image: catalog-api:1.0
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 8000
+      env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: catalog-db-credentials
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: catalog-db-credentials
+              key: DB_PASSWORD
+        - name: API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: catalog-db-credentials
+              key: API_TOKEN
+      volumeMounts:
+        - name: creds
+          mountPath: /etc/creds
+          readOnly: true
+  volumes:
+    - name: creds
+      secret:
+        secretName: catalog-db-credentials
+        defaultMode: 0400

@@ -1,0 +1,28 @@
+# Consumes the ConfigMap both ways: envFrom for the key/values, a volume for the file.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: catalog-cm-demo
+  labels:
+    app: catalog-cm-demo
+spec:
+  containers:
+    - name: api
+      image: catalog-api:1.0
+      imagePullPolicy: Never      # built straight into Minikube's image store
+      ports:
+        - containerPort: 8000
+      envFrom:
+        - configMapRef:
+            name: catalog-config
+      volumeMounts:
+        - name: config-files
+          mountPath: /etc/app-config
+          readOnly: true
+  volumes:
+    - name: config-files
+      configMap:
+        name: catalog-config
+        items:
+          - key: features.ini
+            path: features.ini
