@@ -30,6 +30,7 @@ export default function App() {
   }
 
   const shown = filter === "all" ? issues : issues.filter((i) => i.status === filter);
+  const count = (f) => (f === "all" ? issues.length : issues.filter((i) => i.status === f).length);
 
   return (
     <div className="shell">
@@ -59,7 +60,9 @@ export default function App() {
 
         <div className="filters">
           {["all", "open", "in_progress", "done"].map((f) => (
-            <button key={f} className={filter === f ? "active" : ""} onClick={() => setFilter(f)}>{f === "all" ? "All" : LABEL[f]}</button>
+            <button key={f} className={filter === f ? "active" : ""} onClick={() => setFilter(f)}>
+              {f === "all" ? "All" : LABEL[f]} <span className="count">{count(f)}</span>
+            </button>
           ))}
         </div>
 
@@ -76,7 +79,7 @@ export default function App() {
                 <td><button className="x" onClick={() => api.remove(i.id).then(refresh)}>delete</button></td>
               </tr>
             ))}
-            {shown.length === 0 && <tr><td colSpan="6" className="muted center">No issues here.</td></tr>}
+            {shown.length === 0 && <tr><td colSpan="6" className="muted center">Nothing to show for this filter.</td></tr>}
           </tbody>
         </table>
       </main>
