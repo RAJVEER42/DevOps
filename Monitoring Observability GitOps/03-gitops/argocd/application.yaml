@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Jils31/DevOps.git
+    repoURL: https://github.com/RAJVEER42/DevOps.git
     targetRevision: main
     path: Monitoring Observability GitOps/03-gitops/app
   destination:
