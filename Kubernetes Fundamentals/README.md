@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 Setting up a local cluster, checking it is healthy, reading how the pieces fit together, and
 working through the official Kubernetes Basics tutorial end to end.

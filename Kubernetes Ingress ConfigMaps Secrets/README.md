@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 A small two-tier app (`storefront` static site plus a `catalog-api` backend) used to show
 how configuration and credentials get into Pods and how one Ingress exposes both tiers on a

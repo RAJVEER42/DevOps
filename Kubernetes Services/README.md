@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 The five Service types, each applied against the same single Nginx Pod and then verified
 from wherever that type is supposed to be reachable: inside the cluster, from the node, from

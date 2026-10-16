@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 Two parts. First, the four ways to roll a new version out with a Deployment, each run for
 real with traffic flowing so the behaviour is visible. Second, the Pod lifecycle: twelve

@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 "The app is not working." This folder is about turning that sentence into a root cause with
 a fixed set of commands and a fixed order of questions. Everything was run on Minikube; each
