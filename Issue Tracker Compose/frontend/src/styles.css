@@ -23,7 +23,9 @@ button { cursor: pointer; transition: border-color .12s ease, color .12s ease; }
 button:hover:not([type=submit]) { border-color: var(--accent); color: var(--accent); }
 button[type=submit]:hover { filter: brightness(1.08); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } button[type=submit] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
-.filters { display: flex; gap: 8px; margin-bottom: 12px; } .filters .active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.filters { display: flex; gap: 8px; margin-bottom: 12px; }
+.filters .count { color: var(--muted); font-size: 11px; margin-left: 2px; }
+.filters .active .count { color: var(--accent); } .filters .active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 14px; }
 tbody tr { transition: background .12s ease; } tbody tr:hover { background: rgba(255, 255, 255, .025); }
