@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 A small Bash script that summarises the machine it runs on, asks where to put a report, and
 writes the full process list to that report with output redirection.

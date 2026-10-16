@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 Working notes for the Linux assignment. Every command below was run in an Ubuntu 24.04
 environment (hostname `ubuntu-lab`) and the output was captured as screenshots.

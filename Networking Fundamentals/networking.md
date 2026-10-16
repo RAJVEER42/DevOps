@@ -2,6 +2,7 @@
 
 **Name:** Rajveer Bishnoi
 **Enrollment Number:** 24BCS10404
+**Roll Number:** 10404
 
 Nine everyday networking commands, each run for real, with a note on what the output means.
 Commands that exist on macOS were run on my laptop; the Linux-only ones (`ip`, `ss`, `wget`)
