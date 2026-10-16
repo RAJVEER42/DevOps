@@ -22,7 +22,7 @@ developer ── git push ──> GitHub ──> GitHub Actions
                                        ├─ pytest + frontend build
                                        ├─ docker build (backend, frontend)
                                        ├─ Trivy scan, fail on HIGH/CRITICAL
-                                       ├─ push ghcr.io/jils31/issue-tracker-{backend,frontend}:<sha>
+                                       ├─ push ghcr.io/rajveer42/issue-tracker-{backend,frontend}:<sha>
                                        └─ helm upgrade --install on a kind cluster + smoke test
                      │
                      └──────────────> Argo CD (in the cluster) watches helm/issue-tracker on main
@@ -149,7 +149,7 @@ and the local scan of both images reported zero fixable HIGH or CRITICAL finding
 That is the scan doing exactly its job three times: a release with a vulnerable base image or a
 vulnerable library never reached the registry, and each fix was a one-line version change.
 
-Final run: [37652658661](https://github.com/Jils31/DevOps/actions/runs/37652658661) on commit `7df25a3`, images `ghcr.io/jils31/issue-tracker-backend:7df25a3` and `ghcr.io/jils31/issue-tracker-frontend:7df25a3`.
+Final run: [38892471244](https://github.com/RAJVEER42/DevOps/actions/runs/38892471244) on commit `17ee1b0`, images `ghcr.io/rajveer42/issue-tracker-backend:17ee1b0` and `ghcr.io/rajveer42/issue-tracker-frontend:17ee1b0`.
 
 ```
 1. backend tests: success
