@@ -7,4 +7,4 @@ metadata:
 spec:
   containers:
     - name: web
-      image: ghcr.io/jils31/internal-billing:1.0
+      image: ghcr.io/rajveer42/internal-billing:1.0
