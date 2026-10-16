@@ -93,7 +93,7 @@ commit history.
 
 ## Final run
 
-Run [37602023421](https://github.com/Jils31/DevOps/actions/runs/37602023421) on commit `e917649`:
+Run [38892354078](https://github.com/RAJVEER42/DevOps/actions/runs/38892354078) on commit `d21749c`:
 
 ```
 1. build and unit test: success
@@ -109,7 +109,7 @@ Run [37602023421](https://github.com/Jils31/DevOps/actions/runs/37602023421) on 
 
 Trivy found no fixable HIGH or CRITICAL vulnerabilities in `python:3.12-alpine` plus Flask and
 gunicorn. gitleaks found no secrets across the repository history. The pushed image is
-`ghcr.io/jils31/temp-service:e917649`. In the kind cluster both replicas reached `Running`,
+`ghcr.io/rajveer42/temp-service:d21749c`. In the kind cluster both replicas reached `Running`,
 `/health` returned `ok` and `/api/convert` converted 100 C to 212 F.
 
 ![Actions run](screenshots/actions-run.png)
