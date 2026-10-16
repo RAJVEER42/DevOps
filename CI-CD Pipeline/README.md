@@ -61,7 +61,7 @@ is a hard gate too.
 
 ## Run
 
-Pushed as commit `dcfdd18`. The run completed with every job green:
+Pushed as commit `d21749c`. The run completed with every job green:
 
 ```
 CI / lint                                    success
@@ -72,8 +72,8 @@ CD / run the published image and check it    success
 ```
 
 Test job: `collected 11 items`, `11 passed`, coverage 91%. Publish job: pushed
-`ghcr.io/jils31/pricing-api:dcfdd18` and `:latest`. Smoke-test job: pulled that exact tag,
-started it, `/health` returned `{"status": "ok", "version": "dcfdd18"}` and `/quote` for one
+`ghcr.io/rajveer42/pricing-api:d21749c` and `:latest`. Smoke-test job: pulled that exact tag,
+started it, `/health` returned `{"status": "ok", "version": "d21749c"}` and `/quote` for one
 item at 2500 returned `total 2802.50`, both asserted with `grep -q` so a wrong answer fails
 the job.
 
