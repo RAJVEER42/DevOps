@@ -389,3 +389,7 @@ Full write-up and captures in [troubleshooting/](troubleshooting/README.md).
 | [demo/slides.pptx](demo/slides.pptx) | The presentation deck for the walkthrough |
 | [demo/slides.pdf](demo/slides.pdf) | The same deck as a PDF |
 | `demo/presentation.mp4` | Screen recording of the running application |
+
+The deck is set in [Libre Franklin](https://fonts.google.com/specimen/Libre+Franklin) (SIL Open
+Font License). The PDF embeds it and is correct anywhere; PowerPoint will substitute a system
+face unless Libre Franklin is installed, so present from the PDF if in doubt.
