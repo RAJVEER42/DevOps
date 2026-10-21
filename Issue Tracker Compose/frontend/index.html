@@ -4,10 +4,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Issue tracker: React and Vite frontend, FastAPI backend, PostgreSQL." />
-    <meta name="theme-color" content="#0d1117" />
-    <title>Issue Tracker</title>
+    <meta name="theme-color" content="#E8EDEE" />
+    <title>Issue Board</title>
   </head>
   <body>
+    <!--
+      THESIS: an emergency-department status board, not a SaaS issue table. Priority is
+      acuity and status is bed state, so almost nothing needs translating. Refuses the
+      dark dashboard with pill badges and a stat-card grid.
+      OWN-WORLD: bright enamel board. Cool institutional ground, white plates, hairline
+      graticule, heavy tabular figures, a fixed acuity ramp (1 red / 2 amber / 3 slate)
+      carried by numeral, colour and weight together, never colour alone.
+      STORY: the evaluator reads the census, sees five issues ranked by acuity with their
+      time-in-state, watches one admitted and advanced, and believes it is real.
+      FIRST VIEWPORT: census rail across the top with the five counts at monumental size;
+      intake bar beneath it; the board filling the rest, acuity leftmost, state advanced
+      by clicking the state cell.
+      FORM: hospital triage board, candidate 1 of the grounded list; seed 3277d507.
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+    -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
