@@ -1,8 +1,10 @@
 # Issue Tracker: an end-to-end DevOps capstone
 
-**Name:** Rajveer Bishnoi
-**Enrollment Number:** 24BCS10404
-**Roll Number:** 10404
+| | |
+|---|---|
+| **Name** | Rajveer Bishnoi |
+| **Enrollment Number** | 24BCS10404 |
+| **Roll Number** | 10404 |
 
 A three-tier issue tracker — React front end, FastAPI back end, PostgreSQL — taken from a
 developer laptop to a monitored Kubernetes deployment. The application is deliberately small so
@@ -16,7 +18,7 @@ The interface is a triage board. Priority is shown as **acuity** — a ranked nu
 colour together, so urgency survives a compressed recording where hue does not — and every issue
 carries its time-in-state.
 
-| | |
+| Where | What |
 |---|---|
 | Full write-up | [Final DevOps Project/](Final%20DevOps%20Project/README.md) |
 | The application | [Issue Tracker Compose/](Issue%20Tracker%20Compose/README.md) |
@@ -27,16 +29,24 @@ carries its time-in-state.
 
 ## Contents
 
-[1. Architecture](#1-architecture) · [2. The application](#2-the-application) ·
-[3. Run it locally](#3-run-it-locally) · [4. Tests](#4-tests) ·
-[5. The pipeline](#5-the-pipeline) · [6. The security gate](#6-the-security-gate) ·
-[7. Kubernetes and Helm](#7-kubernetes-and-helm) · [8. Observability](#8-observability) ·
-[9. GitOps](#9-gitops) · [10. Troubleshooting drill](#10-troubleshooting-drill) ·
-[11. Known issues](#11-known-issues-and-limitations) · [12. Coursework index](#12-coursework-index)
+| § | Section | What it covers |
+|---|---|---|
+| 1 | [Architecture](#1-architecture) | How a commit becomes a running image, and how a request reaches the database |
+| 2 | [The application](#2-the-application) | The nine endpoints, and why `/health` and `/ready` differ |
+| 3 | [Run it locally](#3-run-it-locally) | One Compose command |
+| 4 | [Tests](#4-tests) | Eight pytest cases, run before any image is built |
+| 5 | [The pipeline](#5-the-pipeline) | Three stages, and what the smoke test actually proves |
+| 6 | [The security gate](#6-the-security-gate) | The Trivy policy, and the two failures it caught |
+| 7 | [Kubernetes and Helm](#7-kubernetes-and-helm) | What the chart creates, and the config checksum |
+| 8 | [Observability](#8-observability) | Annotation discovery, the metrics, the alert rules |
+| 9 | [GitOps](#9-gitops) | Argo CD, and who owns the replica count |
+| 10 | [Troubleshooting drill](#10-troubleshooting-drill) | Two planted faults, diagnosed from the cluster |
+| 11 | [Known issues](#11-known-issues-and-limitations) | What was not done, and why |
+| 12 | [Coursework index](#12-coursework-index) | The twenty-two topics leading up to this |
 
 ## 1. Architecture
 
-```
+```text
 developer ── git push ──> GitHub ──> GitHub Actions
                                        ├─ pytest + frontend build
                                        ├─ docker build (backend, frontend)
@@ -132,7 +142,7 @@ scanning and image scanning before a security gate decides whether to push.
 
 ## 6. The security gate
 
-```
+```yaml
 severity:        HIGH,CRITICAL
 ignore-unfixed:  true      # no patch available anywhere: report, do not block
 exit-code:       1         # anything else fails the job before the push
