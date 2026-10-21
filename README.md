@@ -166,9 +166,9 @@ The backend Deployment carries a `checksum/config` annotation computed from the 
 Secret, so a configuration change rolls the Pods. Without it, a config change updates the objects
 and nothing restarts to pick it up — invisible until it bites.
 
-| Through the Ingress | Running in the cluster |
+| Verified in the cluster | The board, running on Kubernetes |
 |---|---|
-| ![API exercised through the Ingress](Final%20DevOps%20Project/screenshots/verify-through-ingress.png) | ![The app on Kubernetes](Final%20DevOps%20Project/screenshots/app-on-kubernetes.png) |
+| ![API, metrics and persistence verified in the cluster](Final%20DevOps%20Project/screenshots/verify-in-cluster.png) | ![The board running on Kubernetes](Final%20DevOps%20Project/screenshots/app-on-kubernetes.png) |
 
 Persistence was verified by deleting the postgres Pod: the StatefulSet recreated it against the
 same PVC and the existing issues were still there.

@@ -275,7 +275,7 @@ Persistence was verified by deleting the postgres Pod: the StatefulSet recreated
 PVC and the existing issues were still there.
 
 ![helm deploy](screenshots/helm-deploy.png)
-![verify through ingress](screenshots/verify-through-ingress.png)
+![API, metrics and persistence verified in the cluster](screenshots/verify-in-cluster.png)
 ![the app on kubernetes](screenshots/app-on-kubernetes.png)
 
 ## 11. GitOps with Argo CD
@@ -373,8 +373,8 @@ Full write-up and captures in [troubleshooting/](troubleshooting/README.md).
 | `screenshots/ci-jobs.png` | Job log excerpts: tests, both Trivy scans, the pushes, the smoke test |
 | `screenshots/trivy-local.png` | A local scan of both images under the same policy as CI |
 | `screenshots/helm-deploy.png` | `helm upgrade --install` and the resulting objects |
-| `screenshots/verify-through-ingress.png` | The API exercised through the Ingress, including persistence |
-| `screenshots/app-on-kubernetes.png` | The running UI served from the cluster |
+| `screenshots/verify-in-cluster.png` | The API, the scrape annotations, the probes and the persistence test |
+| `screenshots/app-on-kubernetes.png` | The board served from the cluster by the Helm release |
 | `screenshots/monitoring-and-hpa.png` | The autoscaler reacting to load |
 | `screenshots/prometheus-targets.png` | Every backend Pod discovered and `up` |
 | `screenshots/grafana-dashboard.png` | The provisioned dashboard under load |
