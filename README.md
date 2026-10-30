@@ -23,6 +23,7 @@ carries its time-in-state.
 | Full write-up | [Final DevOps Project/](Final%20DevOps%20Project/README.md) |
 | The application | [Issue Tracker Compose/](Issue%20Tracker%20Compose/README.md) |
 | Demo deck | [slides.pptx](Final%20DevOps%20Project/demo/slides.pptx) · [PDF](Final%20DevOps%20Project/demo/slides.pdf) |
+| Walkthrough | [walkthrough.mp4](Final%20DevOps%20Project/demo/walkthrough.mp4) — 5m55s screen recording |
 | Pipeline | [`issue-tracker-cicd.yml`](.github/workflows/issue-tracker-cicd.yml) |
 | Reference run | [38892471244](https://github.com/RAJVEER42/DevOps/actions/runs/38892471244) on `17ee1b0`, five jobs green |
 | Images | `ghcr.io/rajveer42/issue-tracker-backend:17ee1b0` · `…-frontend:17ee1b0` |

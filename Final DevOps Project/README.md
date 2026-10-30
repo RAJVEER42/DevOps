@@ -388,7 +388,7 @@ Full write-up and captures in [troubleshooting/](troubleshooting/README.md).
 |---|---|
 | [demo/slides.pptx](demo/slides.pptx) | The presentation deck for the walkthrough |
 | [demo/slides.pdf](demo/slides.pdf) | The same deck as a PDF |
-| `demo/presentation.mp4` | Screen recording of the running application |
+| [demo/walkthrough.mp4](demo/walkthrough.mp4) | Screen recording of the running application (5m55s, 1080p) |
 
 The deck is set in [Libre Franklin](https://fonts.google.com/specimen/Libre+Franklin) (SIL Open
 Font License). The PDF embeds it and is correct anywhere; PowerPoint will substitute a system
